@@ -1,6 +1,18 @@
 import { useState } from "react";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
+
+const numericFields = [
+  "party_size",
+  "adt_count",
+  "chd_count",
+  "inf_count",
+  "booking_horizon_days",
+  "base_fare_total",
+  "corporate_flag",
+  "dep_month",
+  "dep_dow",
+];
 
 function App() {
   const [form, setForm] = useState({
@@ -33,23 +45,11 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
-  const numericFields = [
-    "party_size",
-    "adt_count",
-    "chd_count",
-    "inf_count",
-    "booking_horizon_days",
-    "base_fare_total",
-    "corporate_flag",
-    "dep_month",
-    "dep_dow",
-  ];
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({
       ...prev,
-      [name]: numericFields.includes(name) ? Number(value) : value,
+      [name]: numericFields.includes(name) ? Number(value || 0) : value,
     }));
   };
 
@@ -60,6 +60,10 @@ function App() {
     setResult(null);
 
     try {
+      if (!API_BASE_URL) {
+        throw new Error("API base URL not configured");
+      }
+
       const resp = await fetch(`${API_BASE_URL}/predict_bag`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -86,20 +90,29 @@ function App() {
     maxWidth: "600px",
   };
 
-  const labelStyle = { display: "block", marginTop: "8px", fontSize: "0.9rem" };
-  const inputStyle = { width: "260px", padding: "4px", marginTop: "2px" };
+  const labelStyle = {
+    display: "block",
+    marginTop: "8px",
+    fontSize: "0.9rem",
+  };
+
+  const inputStyle = {
+    width: "260px",
+    padding: "4px",
+    marginTop: "2px",
+  };
 
   return (
     <div style={containerStyle}>
       <h1>Extra Baggage Propensity – POC</h1>
       <p style={{ maxWidth: "520px" }}>
-        Enter booking details to estimate the probability that this PNR will buy
-        <strong> extra baggage</strong>.
+        Enter booking details to estimate the probability that this PNR will buy{" "}
+        <strong>extra baggage</strong>.
       </p>
 
       <form onSubmit={handleSubmit}>
-        {/* --- PARTY / FARE --- */}
-        <h3>Party & Fare</h3>
+        {/* PARTY & FARE */}
+        <h3>Party &amp; Fare</h3>
 
         <label style={labelStyle}>
           Party size
@@ -173,8 +186,8 @@ function App() {
           />
         </label>
 
-        {/* --- TRAVELER / ROUTE --- */}
-        <h3 style={{ marginTop: "16px" }}>Traveler & Route</h3>
+        {/* TRAVELER & ROUTE */}
+        <h3 style={{ marginTop: "16px" }}>Traveler &amp; Route</h3>
 
         <label style={labelStyle}>
           Traveler type
@@ -260,8 +273,8 @@ function App() {
           </select>
         </label>
 
-        {/* --- POS / CHANNEL / DEVICE --- */}
-        <h3 style={{ marginTop: "16px" }}>POS & Channel</h3>
+        {/* POS / CHANNEL / DEVICE */}
+        <h3 style={{ marginTop: "16px" }}>POS &amp; Channel</h3>
 
         <label style={labelStyle}>
           POS country
@@ -330,7 +343,7 @@ function App() {
           </select>
         </label>
 
-        {/* --- TIME / SEASON --- */}
+        {/* TIME / SEASON */}
         <h3 style={{ marginTop: "16px" }}>Departure Timing</h3>
 
         <label style={labelStyle}>
@@ -383,7 +396,6 @@ function App() {
         </button>
       </form>
 
-      {/* RESULTS */}
       <div style={{ marginTop: "20px" }}>
         {errorMsg && (
           <div style={{ color: "red", marginBottom: "8px" }}>{errorMsg}</div>
