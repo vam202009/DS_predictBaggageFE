@@ -1,6 +1,8 @@
 import { useState } from "react";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
+//const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
+// TEMP: hard-code for POC
+const API_BASE_URL = "https://dspredictbaggage-production.up.railway.app";
 
 console.log("API_BASE_URL from env:", API_BASE_URL);
 const numericFields = [
